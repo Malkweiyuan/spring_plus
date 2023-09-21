@@ -18,6 +18,7 @@ import java.net.URLConnection;
 public class ImageDownloader {
     public static void main(String[] args) {
         String url = "https://img.alicdn.com/imgextra/i3/2215627909864/O1CN01gwy1Hy2MjleUnymld_!!2215627909864.png";
+
 //
 //        try {
 //            Document document = Jsoup.connect(url).get();

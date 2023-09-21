@@ -1,16 +1,19 @@
 package com.example.springplus.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springplus.dto.UserDTO;
 import com.example.springplus.entity.Usert;
 import com.example.springplus.mapper.UserMapper;
 import com.example.springplus.service.ValidationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,8 +29,13 @@ public class ValidationServiceImpl implements ValidationService {
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper; // Jackson ObjectMapper
+
+    public ValidationServiceImpl(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public String addUser(UserDTO user) {
@@ -51,8 +59,23 @@ public class ValidationServiceImpl implements ValidationService {
         lambdaQueryWrapper.like(Usert::getName, user.getName())
                 .or().like(Usert::getAge, user.getAge())
                 .or().like(Usert::getEmail, user.getEmail());
-        usertList = this.userMapper.selectList(lambdaQueryWrapper);
-        System.out.println("是");
+        String sUser = redisTemplate.opsForValue().get("user");
+        try {
+
+            if (StringUtils.isEmpty(sUser)) {
+                String jsonString = null;
+                jsonString = objectMapper.writeValueAsString(usertList);
+
+                redisTemplate.opsForValue().set("user", jsonString);
+                redisTemplate.expire("user", 1, TimeUnit.MINUTES);
+            } else {
+                String jsonString = redisTemplate.opsForValue().get("user");
+                usertList = objectMapper.readValue(jsonString, new TypeReference<List<Usert>>() {
+                });
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         // Usert u = this.userMapper.selectById(user.getId());
 //        Usert u1 = new Usert();
 //        u1.setEmail("1");

@@ -1,0 +1,49 @@
+  # DataSource Config
+# 配置 Oracle
+server:
+  port: 8021
+knife4j:
+  # 开启增强配置
+  enable: true
+  # 是否开启生产环境屏蔽   true:关闭swagger，false:开启swagger
+  production: false
+  basic:
+    # 是否开启认证
+    enable: false
+    # Basic认证用户名
+    username: admin
+    # Basic认证密码
+    password: 123456
+
+spring:
+  application:
+    name: spring_plus
+  aop:
+    proxy-target-class: true
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver # 固定
+    url: jdbc:oracle:thin:@127.0.0.1:1521/orcl # 按你本地的来
+    username: name # 按你本地的来
+    password: 123 # 按你本地的来
+    hikari:
+        data-source-properties:
+          oracle.net.encoding: GBK
+  # 设置 MyBatis Plus 日志级别
+  logging:
+    level:
+      com.baomidou.mybatisplus: DEBUG
+mybatis-plus:
+  mapper-locations:
+    - classpath*:mapper/*Mapper.xml
+
+
+#  redis:
+#    host: 127.0.0.1
+#    port: 6379
+#    timeout: 3000ms
+#    lettuce:
+#      pool:
+#        max-active: 8
+#        max-idle: 8
+#        min-idle: 2
+#        max-wait: -1ms

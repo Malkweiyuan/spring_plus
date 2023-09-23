@@ -22,9 +22,9 @@ spring:
     proxy-target-class: true
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver # 固定
-    url: jdbc:oracle:thin:@127.0.0.1:1521/orcl # 按你本地的来
-    username: name # 按你本地的来
-    password: 123 # 按你本地的来
+    url: jdbc:oracle:thin:@192.168.17.201:1521/orcl # 按你本地的来
+    username: shbx_h3 # 按你本地的来
+    password: 1 # 按你本地的来
     hikari:
         data-source-properties:
           oracle.net.encoding: GBK
@@ -32,18 +32,28 @@ spring:
   logging:
     level:
       com.baomidou.mybatisplus: DEBUG
+
+  redis:
+    host: 192.168.17.201
+    port: 6379
+    #password: chs-redis@cdhc
+    timeout: 5000
+
+  server:
+    #如果是微服务环境,所有请求需要通过网关转发和返回时,则以下配置需要配置在网关上,而不是目标微服务上
+    compression:
+    #是否对响应数据开启gzip压缩,默认false
+    enabled: true
+    #响应内容长度超过设置大小时进行压缩,默认值为2048(2KB,不带单位时默认为字节)
+    min-response-size: 2KB
+    #对指定的响应类型进行压缩,值是数组,用逗号隔开
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
+
+
+
 mybatis-plus:
   mapper-locations:
     - classpath*:mapper/*Mapper.xml
 
 
-#  redis:
-#    host: 127.0.0.1
-#    port: 6379
-#    timeout: 3000ms
-#    lettuce:
-#      pool:
-#        max-active: 8
-#        max-idle: 8
-#        min-idle: 2
-#        max-wait: -1ms
+

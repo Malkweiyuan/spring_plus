@@ -55,16 +55,15 @@ public class ValidationServiceImpl implements ValidationService {
         QueryWrapper<Usert> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("name", user.getName());
         usertList = this.userMapper.selectList(queryWrapper);
-        LambdaQueryWrapper<Usert> lambdaQueryWrapper = new QueryWrapper<Usert>().lambda();
-        lambdaQueryWrapper.like(Usert::getName, user.getName())
-                .or().like(Usert::getAge, user.getAge())
-                .or().like(Usert::getEmail, user.getEmail());
+//        LambdaQueryWrapper<Usert> lambdaQueryWrapper = new QueryWrapper<Usert>().lambda();
+//        lambdaQueryWrapper.like(Usert::getName, user.getName())
+//                .or().like(Usert::getAge, user.getAge())
+//                .or().like(Usert::getEmail, user.getEmail());
         String sUser = redisTemplate.opsForValue().get("user");
         try {
 
             if (StringUtils.isEmpty(sUser)) {
-                String jsonString = null;
-                jsonString = objectMapper.writeValueAsString(usertList);
+                String  jsonString = objectMapper.writeValueAsString(usertList);
 
                 redisTemplate.opsForValue().set("user", jsonString);
                 redisTemplate.expire("user", 1, TimeUnit.MINUTES);
@@ -89,8 +88,9 @@ public class ValidationServiceImpl implements ValidationService {
 
     @Override
     public Long getId() {
-        //Long redisId = redisTemplate.opsForValue().increment(UNIQUE_ID_KEY, 10);
-        return redisTemplate.opsForValue().increment(UNIQUE_ID_KEY, 10);
+        Long redisId = redisTemplate.opsForValue().increment(UNIQUE_ID_KEY, 10);
+        redisTemplate.expire(UNIQUE_ID_KEY, 1, TimeUnit.MINUTES);
+        return redisId;
     }
 
     public void getRedis() {
